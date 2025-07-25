@@ -1,0 +1,5 @@
+---
+# Testinfra role tasks
+- name: Placeholder task for testinfra role
+  debug:
+    msg: "Configuring testinfra..."

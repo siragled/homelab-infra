@@ -1,0 +1,5 @@
+---
+# Common role tasks
+- name: Placeholder task for common role
+  debug:
+    msg: "Configuring common..."

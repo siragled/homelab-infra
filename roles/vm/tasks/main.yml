@@ -1,0 +1,5 @@
+---
+# Vm role tasks
+- name: Placeholder task for vm role
+  debug:
+    msg: "Configuring vm..."

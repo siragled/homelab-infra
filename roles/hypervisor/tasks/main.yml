@@ -1,0 +1,5 @@
+---
+# Hypervisor role tasks
+- name: Placeholder task for hypervisor role
+  debug:
+    msg: "Configuring hypervisor..."

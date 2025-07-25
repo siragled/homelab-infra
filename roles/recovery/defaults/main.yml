@@ -1,0 +1,3 @@
+---
+# Default variables for recovery role
+recovery_enabled: true

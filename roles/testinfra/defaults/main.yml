@@ -1,0 +1,3 @@
+---
+# Default variables for testinfra role
+testinfra_enabled: true

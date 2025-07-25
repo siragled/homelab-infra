@@ -1,0 +1,43 @@
+---
+all:
+  children:
+    control:
+      hosts:
+        laptop:
+          ansible_host: localhost
+          ansible_connection: local
+    
+    pxe:
+      hosts:
+        laptop:
+          ansible_host: localhost
+    
+    hypervisors:
+      hosts:
+        laptop:
+          ansible_host: localhost
+    
+    k3s_masters:
+      hosts:
+        rpi01:
+          ansible_host: 192.168.1.101
+    
+    k3s_workers:
+      hosts:
+        rpi02:
+          ansible_host: 192.168.1.102
+    
+    monitoring:
+      hosts:
+        laptop:
+          ansible_host: localhost
+
+    raspberry_pi:
+      hosts:
+        rpi01:
+          ansible_host: 192.168.1.101
+        rpi02:
+          ansible_host: 192.168.1.102
+      vars:
+        ansible_user: pi
+        ansible_ssh_private_key_file: ~/.ssh/id_rsa

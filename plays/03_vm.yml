@@ -1,0 +1,10 @@
+---
+- name: VM Automation
+  hosts: all
+  gather_facts: true
+  become: true
+  
+  tasks:
+    - name: Placeholder task for VM Automation
+      debug:
+        msg: "Implementing VM Automation automation..."

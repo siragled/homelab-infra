@@ -1,0 +1,10 @@
+---
+- name: PXE Boot Infrastructure
+  hosts: all
+  gather_facts: true
+  become: true
+  
+  tasks:
+    - name: Placeholder task for PXE Boot Infrastructure
+      debug:
+        msg: "Implementing PXE Boot Infrastructure automation..."

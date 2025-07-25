@@ -1,0 +1,5 @@
+---
+# K3s role tasks
+- name: Placeholder task for k3s role
+  debug:
+    msg: "Configuring k3s..."

@@ -1,0 +1,5 @@
+---
+# Pxe role tasks
+- name: Placeholder task for pxe role
+  debug:
+    msg: "Configuring pxe..."

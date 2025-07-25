@@ -1,0 +1,5 @@
+---
+# Observability role tasks
+- name: Placeholder task for observability role
+  debug:
+    msg: "Configuring observability..."

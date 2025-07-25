@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Danil Aliforenko
+  description: Recovery configuration for homelab infrastructure
+  license: MIT
+  min_ansible_version: 2.12
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+
+dependencies: []
