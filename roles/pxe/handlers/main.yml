@@ -1,21 +1,31 @@
 ---
-- name: restart dhcp
+- name: Restart dhcp
   service:
     name: kea-dhcp4-server
     state: restarted
     enabled: true
 
-- name: restart tftp
+- name: Restart tftp
   service:
     name: tftpd-hpa
     state: restarted
 
-- name: restart nginx
+- name: Restart nginx
   service:
     name: nginx
     state: restarted
 
-- name: reload nginx
+- name: Reload nginx
   service:
     name: nginx
     state: reloaded
+
+- name: Reload supervisor
+  service:
+    name: supervisor
+    state: reloaded
+
+- name: Restart callback service
+  supervisorctl:
+    name: pxe-callback
+    state: restarted

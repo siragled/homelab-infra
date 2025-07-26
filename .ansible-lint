@@ -1,0 +1,9 @@
+---
+exclude_paths:
+  - .vscode/
+  - .github/
+
+skip_list:
+  - var-naming[no-role-prefix]
+  - fqcn
+  - package-latest

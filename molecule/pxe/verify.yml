@@ -8,3 +8,5 @@
       ansible.builtin.command:
         cmd: >
           pytest -q -ra molecule/pxe/tests
+      changed_when: false
+      check_mode: false

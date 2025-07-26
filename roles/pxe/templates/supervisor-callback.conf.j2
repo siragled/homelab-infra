@@ -1,0 +1,10 @@
+[program:pxe-callback]
+command=/opt/pxe-callback/venv/bin/python -m uvicorn app:app --host {{ callback_api_host }} --port {{ callback_api_port }}
+directory=/opt/pxe-callback
+user=pxe-callback
+group=pxe-callback
+autostart=true
+autorestart=true
+stderr_logfile=/opt/pxe-callback/logs/error.log
+stdout_logfile=/opt/pxe-callback/logs/access.log
+environment=PYTHONPATH="/opt/pxe-callback"

@@ -3,7 +3,6 @@
   include_tasks: dhcp.yml
   tags: [pxe, dhcp]
 
-
 - name: Include TFTP configuration
   include_tasks: tftp.yml
   tags: [pxe, tftp]
@@ -18,3 +17,8 @@
   include_tasks: ipxe.yml
   tags: [pxe, ipxe]
   when: ipxe_enabled | default(true) | bool
+
+- name: Include callback system
+  include_tasks: callback.yml
+  tags: [pxe, callback]
+  when: callback_enabled | default(true) | bool

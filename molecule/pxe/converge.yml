@@ -7,6 +7,6 @@
   roles:
     - role: pxe
       vars:
-        pxe_run_tests: false      
+        pxe_run_tests: false
         pxe_enabled_components:
           - dhcp

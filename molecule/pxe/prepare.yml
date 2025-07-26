@@ -3,9 +3,10 @@
   hosts: all
   become: true
   tasks:
-    - apt:
+    - name: Prepare needed packages
+      apt:
         name:
           - kea-dhcp4-server
-          - net-tools           
+          - net-tools
         state: present
-        update_cache: yes
+        update_cache: true

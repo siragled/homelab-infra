@@ -38,7 +38,7 @@
   loop:
     - src: user-data-amd64.j2
       dest: user-data
-    - src: user-data-arm64.j2  
+    - src: user-data-arm64.j2
       dest: user-data-arm64
   when: ipxe_enabled | bool
   register: user_data_result

@@ -1,10 +1,21 @@
 ---
-- import_playbook: 01_pxe.yml
-- import_playbook: 02_hypervisor.yml  
-- import_playbook: 03_vm.yml
-- import_playbook: 04_k3s.yml
-- import_playbook: 05_observability.yml
-- import_playbook: 06_integration.yml
+- name: PXE setup
+  import_playbook: 01_pxe.yml
+
+- name: Hypervisor setup
+  import_playbook: 02_hypervisor.yml
+
+- name: VM provisioning
+  import_playbook: 03_vm.yml
+
+- name: K3s cluster
+  import_playbook: 04_k3s.yml
+
+- name: Observability stack
+  import_playbook: 05_observability.yml
+
+- name: Integration checks
+  import_playbook: 06_integration.yml
 
 - name: Homelab Infrastructure Deployment Complete
   hosts: localhost

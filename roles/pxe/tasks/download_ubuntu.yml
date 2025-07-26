@@ -19,15 +19,19 @@
 
 - name: Download Ubuntu 24.04+ netboot files
   get_url:
-    url: "{{ netboot_base_url }}/{{ ubuntu_version.codename }}/{{ netboot_path }}/{{ item[0] }}/{{ item[1] }}"
-    dest: "{{ pxe_http_root }}/ubuntu/{{ ubuntu_version.version }}/{{ item[0] }}/{{ item[1] }}"
+    url: >-
+      {{ netboot_base_url }}/{{ ubuntu_version.codename }}/{{ netboot_path }}/{{ item[0] }}/{{ item[1] }}
+    dest: >-
+      {{ pxe_http_root }}/ubuntu/{{ ubuntu_version.version }}/{{ item[0] }}/{{ item[1] }}
     owner: www-data
     group: www-data
     mode: '0644'
     timeout: 300
   vars:
-    netboot_base_url: "{{ 'https://releases.ubuntu.com' if item[0] == 'amd64' else 'https://cdimage.ubuntu.com/releases' }}"
-    netboot_path: "{{ 'netboot' if item[0] == 'amd64' else 'release/netboot' }}"
+    netboot_base_url: >-
+      {{ 'https://releases.ubuntu.com' if item[0] == 'amd64' else 'https://cdimage.ubuntu.com/releases' }}
+    netboot_path: >-
+      {{ 'netboot' if item[0] == 'amd64' else 'release/netboot' }}
   with_nested:
     - "{{ ubuntu_version.arch }}"
     - ["linux", "initrd"]

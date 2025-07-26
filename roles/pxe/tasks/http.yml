@@ -31,22 +31,22 @@
     owner: root
     group: root
     mode: '0644'
-  notify: 
-    - restart nginx
-    - reload nginx
+  notify:
+    - Restart nginx
+    - Reload nginx
 
 - name: Enable PXE site
   file:
     src: "{{ service_configs.http }}"
     dest: "/etc/nginx/sites-enabled/pxe"
     state: link
-  notify: reload nginx
+  notify: Reload nginx
 
 - name: Disable default Nginx site
   file:
     path: "/etc/nginx/sites-enabled/default"
     state: absent
-  notify: reload nginx
+  notify: Reload nginx
 
 - name: Ensure Nginx is running
   service:

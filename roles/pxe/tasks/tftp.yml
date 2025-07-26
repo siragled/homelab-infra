@@ -19,7 +19,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart tftp
+  notify: Restart tftp
 
 - name: Download netboot.xyz binaries
   get_url:

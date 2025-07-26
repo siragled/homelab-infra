@@ -23,7 +23,7 @@ ipxe_bootfile_bios: "netboot.xyz.kpxe"
 ipxe_bootfile_uefi_x86: "netboot.xyz.efi"
 ipxe_bootfile_uefi_arm: "netboot.xyz.efi"
 ipxe_enabled: true
-ipxe_menu_timeout: 30000 
+ipxe_menu_timeout: 30000
 ipxe_default_option: "ubuntu-2404-amd64"
 
 # Custom iPXE menu options
@@ -34,18 +34,13 @@ ipxe_menu_items:
     kernel: "ubuntu/24.04/amd64/linux"
     initrd: "ubuntu/24.04/amd64/initrd"
     args: "autoinstall ds=nocloud-net;s=http://{{ pxe_next_server }}/cloud-init/"
-  
+
   - id: "ubuntu-2404-arm64"
     name: "Ubuntu 24.04 LTS (ARM64)"
-    arch: "arm64" 
+    arch: "arm64"
     kernel: "ubuntu/24.04/arm64/linux"
-    initrd: "ubuntu/24.04/arm64/initrd"  
+    initrd: "ubuntu/24.04/arm64/initrd"
     args: "autoinstall ds=nocloud-net;s=http://{{ pxe_next_server }}/cloud-init-arm64/"
-    
-  # - id: "netboot-xyz"
-  #   name: "netboot.xyz (Internet Boot Menu)"
-  #   action: "chain"
-  #   url: "https://boot.netboot.xyz"
 
 # Organization branding
 organization_name: "Danil's homelab"
@@ -56,7 +51,7 @@ netboot_binaries:
   - name: "netboot.xyz.kpxe"
     url: "https://boot.netboot.xyz/ipxe/netboot.xyz.kpxe"
     description: "Legacy BIOS netboot.xyz"
-  - name: "netboot.xyz.efi" 
+  - name: "netboot.xyz.efi"
     url: "https://boot.netboot.xyz/ipxe/netboot.xyz.efi"
     description: "UEFI x86_64/ARM64 netboot.xyz"
 
@@ -65,7 +60,7 @@ boot_files:
   - name: "grubx64.efi"
     arch: "x86_64"
     path: "grub"
-  - name: "grubaa64.efi" 
+  - name: "grubaa64.efi"
     arch: "arm64"
     path: "grub"
   - name: "memtest86plus.bin"
@@ -78,18 +73,28 @@ ubuntu_ports_url: "http://ports.ubuntu.com/ubuntu-ports"
 
 # Ubuntu Versions
 ubuntu_versions:
-  - version: "24.04" 
+  - version: "24.04"
     codename: "noble"
     arch: ["amd64", "arm64"]
 
-# Preseed Configuration
-preseed_users:
-  - name: "ubuntu"
-    fullname: "Ubuntu User"
-    password_hash: "$6$rounds=4096$..."
-    ssh_keys: []
-
-# Callback API
+# Post-Installation Callback System
 callback_enabled: true
-callback_port: 5000
-callback_secret: "{{ vault_callback_secret }}"
+callback_api_port: 5000
+callback_api_host: "0.0.0.0"
+callback_log_file: "/var/log/pxe-callbacks.log"
+callback_inventory_file: "/etc/ansible/hosts.d/pxe-provisioned.yml"
+
+# Node registration settings
+node_registration_timeout: 300  # 5 minutes
+auto_add_to_inventory: true
+default_node_groups: ["all", "pxe-provisioned"]
+
+# Post-install automation
+post_install_enabled: true
+post_install_scripts:
+  - name: "system-setup.sh"
+    description: "Basic system configuration"
+  - name: "ssh-keys.sh"
+    description: "SSH key deployment"
+  - name: "monitoring-agent.sh"
+    description: "Install monitoring agent"

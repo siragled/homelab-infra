@@ -11,4 +11,4 @@
     owner: root
     group: root
     mode: "0644"
-  notify: restart dhcp
+  notify: Restart dhcp
