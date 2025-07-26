@@ -1,0 +1,39 @@
+---
+- name: Install TFTP packages
+  package:
+    name: "{{ required_packages.tftp }}"
+    state: present
+
+- name: Create TFTP root directory
+  file:
+    path: "{{ tftp_root }}"
+    state: directory
+    owner: tftp
+    group: tftp
+    mode: '0755'
+
+- name: Deploy TFTP daemon configuration
+  template:
+    src: tftpd-hpa.j2
+    dest: "{{ service_configs.tftp }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart tftp
+
+- name: Download netboot.xyz binaries
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ tftp_root }}/{{ item.name }}"
+    owner: tftp
+    group: tftp
+    mode: '0644'
+    timeout: 30
+  loop: "{{ netboot_binaries }}"
+  when: tftp_enabled | bool
+
+- name: Ensure TFTP service is enabled and started
+  service:
+    name: tftpd-hpa
+    enabled: true
+    state: started

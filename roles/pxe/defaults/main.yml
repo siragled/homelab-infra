@@ -17,9 +17,35 @@ pxe_http_port: 80
 # iPXE Configuration
 ipxe_timeout: 5000
 default_boot_option: "ubuntu2204"
-ipxe_bootfile_bios: "undionly.kpxe"     #  Legacy/BIOS
-ipxe_bootfile_uefi_x86: "ipxe.efi"      #  UEFI x86_64
-ipxe_bootfile_uefi_arm: "snp.efi"       #  UEFI aarch64
+ipxe_bootfile_bios: "netboot.xyz.kpxe"
+ipxe_bootfile_uefi_x86: "netboot.xyz.efi"
+ipxe_bootfile_uefi_arm: "netboot.xyz.efi"
+
+# TFTP Configuration
+tftp_root: "/srv/tftp"
+tftp_enabled: true
+
+# Netboot binaries
+netboot_binaries:
+  - name: "netboot.xyz.kpxe"
+    url: "https://boot.netboot.xyz/ipxe/netboot.xyz.kpxe"
+    description: "Legacy BIOS netboot.xyz"
+  - name: "netboot.xyz.efi" 
+    url: "https://boot.netboot.xyz/ipxe/netboot.xyz.efi"
+    description: "UEFI x86_64/ARM64 netboot.xyz"
+
+# Boot files to deploy
+boot_files:
+  - name: "grubx64.efi"
+    arch: "x86_64"
+    path: "grub"
+  - name: "grubaa64.efi" 
+    arch: "arm64"
+    path: "grub"
+  - name: "memtest86plus.bin"
+    arch: "x86_64"
+    path: "memtest"
+
 
 # Ubuntu Versions
 ubuntu_versions:

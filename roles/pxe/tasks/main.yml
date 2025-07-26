@@ -2,3 +2,9 @@
 - name: Include DHCP configuration
   include_tasks: dhcp.yml
   tags: [pxe, dhcp]
+
+
+- name: Include TFTP configuration
+  include_tasks: tftp.yml
+  tags: [pxe, tftp]
+  when: tftp_enabled | default(true) | bool

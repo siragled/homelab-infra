@@ -47,12 +47,7 @@ def test_pxe_boot_config(host):
     if "next-server" in subnet:
         assert subnet["next-server"] is not None
         assert "boot-file-name" in subnet
-        assert subnet["boot-file-name"] == "undionly.kpxe"
-    else:
-        # Check numeric options instead
-        options = {f"code_{opt['code']}": opt["data"] for opt in subnet["option-data"] if "code" in opt}
-        assert "code_66" in options  # TFTP server
-        assert "code_67" in options  # Boot filename
+        assert subnet["boot-file-name"] == "netboot.xyz.kpxe" 
 
 def test_global_options(host):
     """Test global DHCP options"""

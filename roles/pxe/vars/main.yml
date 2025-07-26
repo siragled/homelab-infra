@@ -4,6 +4,10 @@ required_packages:
   dhcp:
     - kea-dhcp4-server
     - kea-common
+  tftp:
+    - tftpd-hpa
+    - tftp-hpa
 
 service_configs:
   dhcp: "/etc/kea/kea-dhcp4.conf"
+  tftp: "/etc/default/tftpd-hpa"

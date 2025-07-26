@@ -4,3 +4,8 @@
     name: kea-dhcp4-server
     state: restarted
     enabled: true
+    
+- name: restart tftp
+  service:
+    name: tftpd-hpa
+    state: restarted
