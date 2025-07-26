@@ -1,0 +1,14 @@
+---
+- name: Install Kea DHCP packages
+  package:
+    name: "{{ required_packages.dhcp }}"
+    state: present
+
+- name: Deploy Kea DHCPv4 config
+  template:
+    src: kea-dhcp4.conf.j2
+    dest: "{{ service_configs.dhcp }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart dhcp

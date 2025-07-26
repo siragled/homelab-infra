@@ -1,5 +1,4 @@
 ---
-# Pxe role tasks
-- name: Placeholder task for pxe role
-  debug:
-    msg: "Configuring pxe..."
+- name: Include DHCP configuration
+  include_tasks: dhcp.yml
+  tags: [pxe, dhcp]

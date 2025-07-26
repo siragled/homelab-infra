@@ -9,9 +9,5 @@ galaxy_info:
       versions:
         - focal
         - jammy
-    - name: Debian
-      versions:
-        - bullseye
-        - bookworm
 
 dependencies: []

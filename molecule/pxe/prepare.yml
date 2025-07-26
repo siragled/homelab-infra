@@ -1,0 +1,11 @@
+---
+- name: Ensure needed packages exist
+  hosts: all
+  become: true
+  tasks:
+    - apt:
+        name:
+          - kea-dhcp4-server
+          - net-tools           
+        state: present
+        update_cache: yes

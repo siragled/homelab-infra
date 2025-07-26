@@ -1,0 +1,23 @@
+{
+  "Dhcp4": {
+    "valid-lifetime": 3600,
+    "lease-database": { "type": "memfile", "persist": true, "name": "/var/lib/kea/dhcp4.leases" },
+    "option-data": [
+      { "name": "domain-name-servers", "data": "{{ dhcp_subnets[0].dns_servers | join(',') }}" },
+      { "name": "domain-name",         "data": "{{ dhcp_subnets[0].domain }}" }
+    ],
+    "subnet4": [
+{% for net in dhcp_subnets %}
+      {
+        "subnet": "{{ net.subnet }}",
+        "pools": [ { "pool": "{{ net.range_start }} - {{ net.range_end }}" } ],
+        "next-server": "{{ pxe_next_server }}",
+        "boot-file-name": "{{ ipxe_bootfile_bios }}",
+        "option-data": [
+          { "name": "routers", "data": "{{ net.gateway }}" }
+        ]
+      }{{ "," if not loop.last }}
+{% endfor %}
+    ]
+  }
+}

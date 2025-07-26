@@ -1,3 +1,40 @@
 ---
-# Default variables for pxe role
-pxe_enabled: true
+# DHCP Configuration
+dhcp_subnets:
+  - subnet: "192.168.1.0/24"
+    range_start: "192.168.1.100"
+    range_end: "192.168.1.200"
+    gateway: "192.168.1.1"
+    dns_servers: ["8.8.8.8", "1.1.1.1"]
+    domain: "homelab.local"
+
+# PXE Server Settings
+pxe_next_server: "{{ ansible_default_ipv4.address }}"
+tftp_root: "/srv/tftp"
+pxe_http_root: "/var/www/pxe"
+pxe_http_port: 80
+
+# iPXE Configuration
+ipxe_timeout: 5000
+default_boot_option: "ubuntu2204"
+ipxe_bootfile_bios: "undionly.kpxe"     #  Legacy/BIOS
+ipxe_bootfile_uefi_x86: "ipxe.efi"      #  UEFI x86_64
+ipxe_bootfile_uefi_arm: "snp.efi"       #  UEFI aarch64
+
+# Ubuntu Versions
+ubuntu_versions:
+  - version: "22.04"
+    codename: "jammy"
+    arch: ["amd64", "arm64"]
+
+# Preseed Configuration
+preseed_users:
+  - name: "ubuntu"
+    fullname: "Ubuntu User"
+    password_hash: "$6$rounds=4096$..."
+    ssh_keys: []
+
+# Callback API
+callback_enabled: true
+callback_port: 5000
+callback_secret: "{{ vault_callback_secret }}"

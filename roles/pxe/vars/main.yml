@@ -1,0 +1,9 @@
+---
+# Internal variables
+required_packages:
+  dhcp:
+    - kea-dhcp4-server
+    - kea-common
+
+service_configs:
+  dhcp: "/etc/kea/kea-dhcp4.conf"
