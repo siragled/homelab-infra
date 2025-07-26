@@ -1,0 +1,43 @@
+#!/bin/bash
+# Monitoring Agent Installation Script - {{ organization_name }}
+
+set -euo pipefail
+
+# Install Node Exporter for Prometheus monitoring
+NODE_EXPORTER_VERSION="1.6.1"
+NODE_EXPORTER_URL="https://github.com/prometheus/node_exporter/releases/download/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
+
+# Create monitoring user
+useradd --no-create-home --shell /bin/false node_exporter || true
+
+# Download and install
+cd /tmp
+wget -q "$NODE_EXPORTER_URL"
+tar xzf "node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
+cp "node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64/node_exporter" /usr/local/bin/
+chown node_exporter:node_exporter /usr/local/bin/node_exporter
+chmod +x /usr/local/bin/node_exporter
+
+# Create systemd service
+cat > /etc/systemd/system/node_exporter.service << 'EOF'
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start service
+systemctl daemon-reload
+systemctl enable node_exporter
+systemctl start node_exporter
+
+echo "Monitoring agent installed and started successfully"

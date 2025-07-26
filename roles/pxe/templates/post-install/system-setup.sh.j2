@@ -1,0 +1,34 @@
+#!/bin/bash
+# System Setup Script - {{ organization_name }}
+
+set -euo pipefail
+
+# Update package lists
+apt-get update -qq
+
+# Install essential packages
+apt-get install -y \
+    curl \
+    wget \
+    vim \
+    htop \
+    tree \
+    jq \
+    net-tools \
+    tcpdump \
+    dnsutils \
+    git
+
+# Configure timezone
+timedatectl set-timezone UTC
+
+# Optimize SSH configuration
+sed -i 's/#PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+systemctl reload ssh
+
+# Set up automatic security updates
+apt-get install -y unattended-upgrades
+dpkg-reconfigure -plow unattended-upgrades
+
+echo "System setup completed successfully"

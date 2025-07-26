@@ -1,0 +1,26 @@
+---
+# Internal variables
+required_packages:
+  dhcp:
+    - kea-dhcp4-server
+    - kea-common
+  tftp:
+    - tftpd-hpa
+    - tftp-hpa
+  http:
+    - nginx
+    - curl
+    - wget
+  callback:
+    - python3
+    - python3-pip
+    - python3-venv
+    - python3-dev
+    - supervisor
+    - net-tools
+
+service_configs:
+  dhcp: "/etc/kea/kea-dhcp4.conf"
+  tftp: "/etc/default/tftpd-hpa"
+  http: "/etc/nginx/sites-available/pxe"
+  callback: "/etc/supervisor/conf.d/pxe-callback.conf"

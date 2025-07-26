@@ -1,22 +1,26 @@
 ---
-- name: Homelab Infrastructure Automation - Complete Deployment
+- name: PXE setup
+  import_playbook: 01_pxe.yml
+
+- name: Hypervisor setup
+  import_playbook: 02_hypervisor.yml
+
+- name: VM provisioning
+  import_playbook: 03_vm.yml
+
+- name: K3s cluster
+  import_playbook: 04_k3s.yml
+
+- name: Observability stack
+  import_playbook: 05_observability.yml
+
+- name: Integration checks
+  import_playbook: 06_integration.yml
+
+- name: Homelab Infrastructure Deployment Complete
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Deploy PXE infrastructure
-      import_playbook: 01_pxe.yml
-    
-    - name: Setup hypervisors
-      import_playbook: 02_hypervisor.yml
-    
-    - name: Deploy VMs
-      import_playbook: 03_vm.yml
-    
-    - name: Deploy K3s cluster
-      import_playbook: 04_k3s.yml
-    
-    - name: Deploy observability stack
-      import_playbook: 05_observability.yml
-    
-    - name: Run integration tests
-      import_playbook: 06_integration.yml
+    - name: Display deployment summary
+      debug:
+        msg: "Complete homelab infrastructure deployment finished"

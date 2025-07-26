@@ -1,0 +1,57 @@
+#!ipxe
+# {{ organization_name }} - {{ item.upper() }} Boot Menu
+
+set menu-timeout {{ ipxe_menu_timeout }}
+set menu-default {{ ipxe_default_option }}
+
+# Menu definition
+menu {{ organization_name }} - {{ item.upper() }} Options
+item --gap --             ── Operating System Installation ──
+{% for menu_item in ipxe_menu_items %}
+{% if menu_item.arch is undefined or menu_item.arch == item %}
+item {{ menu_item.id }} {{ menu_item.name }}
+{% endif %}
+{% endfor %}
+item --gap --             ── Utilities ──
+item shell                Drop to iPXE shell
+item reboot               Reboot computer
+item exit                 Exit to BIOS
+choose --timeout ${menu-timeout} --default ${menu-default} selected || goto cancel
+goto ${selected}
+
+{% for menu_item in ipxe_menu_items %}
+{% if menu_item.arch is undefined or menu_item.arch == item %}
+:{{ menu_item.id }}
+{% if menu_item.action is defined and menu_item.action == "chain" %}
+chain {{ menu_item.url }}
+{% else %}
+echo Booting {{ menu_item.name }}...
+kernel http://{{ pxe_next_server }}/{{ menu_item.kernel }} {{ menu_item.args | default('') }}
+initrd http://{{ pxe_next_server }}/{{ menu_item.initrd }}
+boot
+{% endif %}
+goto end
+
+{% endif %}
+{% endfor %}
+
+:shell
+echo Type 'exit' to return to menu
+shell
+goto start
+
+:reboot
+reboot
+
+:exit
+exit
+
+:cancel
+echo Boot cancelled
+goto shell
+
+:end
+# Boot completed or failed
+echo Press any key to return to menu...
+prompt
+goto start

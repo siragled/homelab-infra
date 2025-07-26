@@ -1,0 +1,153 @@
+---
+- name: Install callback service packages
+  package:
+    name: "{{ required_packages.callback }}"
+    state: present
+  when: callback_enabled | bool
+
+- name: Create callback service user
+  user:
+    name: pxe-callback
+    system: true
+    shell: /bin/false
+    home: /opt/pxe-callback
+    create_home: true
+  when: callback_enabled | bool
+
+- name: Create callback service directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: pxe-callback
+    group: pxe-callback
+    mode: '0755'
+  loop:
+    - /opt/pxe-callback
+    - /opt/pxe-callback/logs
+    - /etc/ansible/hosts.d
+  when: callback_enabled | bool
+
+- name: Create scripts directory for HTTP server
+  file:
+    path: "{{ pxe_http_root }}/scripts"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  when: callback_enabled | bool
+
+- name: Create Python virtual environment for callback service
+  command: python3 -m venv /opt/pxe-callback/venv
+  args:
+    creates: /opt/pxe-callback/venv/bin/python
+  become: true
+  become_user: pxe-callback
+  when: callback_enabled | bool
+
+- name: Upgrade pip in virtual environment
+  pip:
+    name: pip
+    state: latest
+    executable: /opt/pxe-callback/venv/bin/pip
+  become: true
+  become_user: pxe-callback
+  when: callback_enabled | bool
+
+- name: Install Python packages in virtual environment
+  pip:
+    name:
+      - fastapi==0.104.1
+      - uvicorn[standard]==0.24.0
+      - pydantic==2.5.0
+      - pyyaml==6.0.1
+      - python-multipart==0.0.6
+    executable: /opt/pxe-callback/venv/bin/pip
+  become: true
+  become_user: pxe-callback
+  when: callback_enabled | bool
+
+- name: Deploy callback service configuration
+  template:
+    src: callback-config.yml.j2
+    dest: /opt/pxe-callback/config.yml
+    owner: pxe-callback
+    group: pxe-callback
+    mode: '0644'
+  when: callback_enabled | bool
+
+- name: Deploy callback service application
+  template:
+    src: callback-service.py.j2
+    dest: /opt/pxe-callback/app.py
+    owner: pxe-callback
+    group: pxe-callback
+    mode: '0644'
+  notify: Restart callback service
+  when: callback_enabled | bool
+
+- name: Deploy supervisor configuration for callback service
+  template:
+    src: supervisor-callback.conf.j2
+    dest: "{{ service_configs.callback }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Reload supervisor
+    - Restart callback service
+  when: callback_enabled | bool
+
+- name: Ensure supervisor is running
+  service:
+    name: supervisor
+    state: started
+    enabled: true
+  when: callback_enabled | bool
+
+- name: Deploy post-installation scripts
+  template:
+    src: "post-install/{{ item.name }}.j2"
+    dest: "{{ pxe_http_root }}/scripts/{{ item.name }}"
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  loop: "{{ post_install_scripts }}"
+  when:
+    - callback_enabled | bool
+    - post_install_enabled | bool
+
+- name: Deploy main post-install orchestrator
+  template:
+    src: post-install.sh.j2
+    dest: "{{ pxe_http_root }}/scripts/post-install.sh"
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  when:
+    - callback_enabled | bool
+    - post_install_enabled | bool
+
+- name: Check if callback service is configured in supervisor
+  community.general.supervisorctl:
+    name: pxe-callback
+    state: present
+  register: callback_configured
+  failed_when: false
+  changed_when: false
+  when: callback_enabled | bool
+
+- name: Add callback service to supervisor if not present
+  community.general.supervisorctl:
+    name: pxe-callback
+    state: present
+  when:
+    - callback_enabled | bool
+    - callback_configured is defined
+    - not callback_configured.exists
+
+
+- name: Ensure callback service is started
+  supervisorctl:
+    name: pxe-callback
+    state: started
+  when: callback_enabled | bool

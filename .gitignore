@@ -1,6 +1,7 @@
 # Ansible
 *.retry
 .cache/
+.ansible/
 collections/ansible_collections/
 !collections/requirements.yml
 

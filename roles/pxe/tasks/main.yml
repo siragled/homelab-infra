@@ -1,5 +1,24 @@
 ---
-# Pxe role tasks
-- name: Placeholder task for pxe role
-  debug:
-    msg: "Configuring pxe..."
+- name: Include DHCP configuration
+  include_tasks: dhcp.yml
+  tags: [pxe, dhcp]
+
+- name: Include TFTP configuration
+  include_tasks: tftp.yml
+  tags: [pxe, tftp]
+  when: tftp_enabled | default(true) | bool
+
+- name: Include HTTP configuration
+  include_tasks: http.yml
+  tags: [pxe, http]
+  when: pxe_http_enabled | default(true) | bool
+
+- name: Include iPXE configuration
+  include_tasks: ipxe.yml
+  tags: [pxe, ipxe]
+  when: ipxe_enabled | default(true) | bool
+
+- name: Include callback system
+  include_tasks: callback.yml
+  tags: [pxe, callback]
+  when: callback_enabled | default(true) | bool

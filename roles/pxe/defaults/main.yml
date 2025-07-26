@@ -1,3 +1,100 @@
 ---
-# Default variables for pxe role
-pxe_enabled: true
+# DHCP Configuration
+dhcp_subnets:
+  - subnet: "192.168.1.0/24"
+    range_start: "192.168.1.100"
+    range_end: "192.168.1.200"
+    gateway: "192.168.1.1"
+    dns_servers: ["8.8.8.8", "1.1.1.1"]
+    domain: "homelab.local"
+
+# PXE Server Settings
+pxe_next_server: "{{ ansible_default_ipv4.address }}"
+tftp_enabled: true
+tftp_root: "/srv/tftp"
+pxe_http_enabled: true
+pxe_http_root: "/var/www/pxe"
+pxe_http_port: 80
+
+# iPXE Configuration
+ipxe_timeout: 5000
+default_boot_option: "ubuntu2404"
+ipxe_bootfile_bios: "netboot.xyz.kpxe"
+ipxe_bootfile_uefi_x86: "netboot.xyz.efi"
+ipxe_bootfile_uefi_arm: "netboot.xyz.efi"
+ipxe_enabled: true
+ipxe_menu_timeout: 30000
+ipxe_default_option: "ubuntu-2404-amd64"
+
+# Custom iPXE menu options
+ipxe_menu_items:
+  - id: "ubuntu-2404-amd64"
+    name: "Ubuntu 24.04 LTS (AMD64)"
+    arch: "amd64"
+    kernel: "ubuntu/24.04/amd64/linux"
+    initrd: "ubuntu/24.04/amd64/initrd"
+    args: "autoinstall ds=nocloud-net;s=http://{{ pxe_next_server }}/cloud-init/"
+
+  - id: "ubuntu-2404-arm64"
+    name: "Ubuntu 24.04 LTS (ARM64)"
+    arch: "arm64"
+    kernel: "ubuntu/24.04/arm64/linux"
+    initrd: "ubuntu/24.04/arm64/initrd"
+    args: "autoinstall ds=nocloud-net;s=http://{{ pxe_next_server }}/cloud-init-arm64/"
+
+# Organization branding
+organization_name: "Danil's homelab"
+contact_info: "https://github.com/siragled/homelab-infra"
+
+# Netboot binaries
+netboot_binaries:
+  - name: "netboot.xyz.kpxe"
+    url: "https://boot.netboot.xyz/ipxe/netboot.xyz.kpxe"
+    description: "Legacy BIOS netboot.xyz"
+  - name: "netboot.xyz.efi"
+    url: "https://boot.netboot.xyz/ipxe/netboot.xyz.efi"
+    description: "UEFI x86_64/ARM64 netboot.xyz"
+
+# Boot files to deploy
+boot_files:
+  - name: "grubx64.efi"
+    arch: "x86_64"
+    path: "grub"
+  - name: "grubaa64.efi"
+    arch: "arm64"
+    path: "grub"
+  - name: "memtest86plus.bin"
+    arch: "x86_64"
+    path: "memtest"
+
+# Mirror URLs
+ubuntu_mirror_url: "http://archive.ubuntu.com/ubuntu"
+ubuntu_ports_url: "http://ports.ubuntu.com/ubuntu-ports"
+
+# Ubuntu Versions
+ubuntu_versions:
+  - version: "24.04"
+    codename: "noble"
+    arch: ["amd64", "arm64"]
+
+# Post-Installation Callback System
+callback_enabled: true
+callback_api_port: 5000
+callback_api_host: "0.0.0.0"
+callback_log_file: "/var/log/pxe-callbacks.log"
+callback_inventory_file: "/etc/ansible/hosts.d/pxe-provisioned.yml"
+
+# Node registration settings
+node_registration_timeout: 300  # 5 minutes
+auto_add_to_inventory: true
+default_node_groups: ["all", "pxe-provisioned"]
+
+# Post-install automation
+post_install_enabled: true
+post_install_scripts:
+  - name: "system-setup.sh"
+    description: "Basic system configuration"
+  - name: "ssh-keys.sh"
+    description: "SSH key deployment"
+  - name: "monitoring-agent.sh"
+    description: "Install monitoring agent"

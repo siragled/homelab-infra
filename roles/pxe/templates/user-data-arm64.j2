@@ -1,0 +1,58 @@
+#cloud-config
+autoinstall:
+  version: 1
+  
+  locale: en_US.UTF-8
+  
+  keyboard:
+    layout: us
+    variant: ''
+    toggle: null
+  
+  network:
+    version: 2
+    ethernets:
+      eth0:
+        match:
+          name: "en*"
+        dhcp4: true
+  
+  apt:
+    preserve_sources_list: false
+    primary:
+      - arches: [arm64]
+        uri: http://ports.ubuntu.com/ubuntu-ports
+    security:
+      - arches: [arm64]
+        uri: http://ports.ubuntu.com/ubuntu-ports
+  
+  identity:
+    hostname: ubuntu-pxe-arm64
+    username: admin  
+    password: "$6$rounds=4096$saltsalt$L/Bkq8k8tE.slB6HD9Mg5Q6G1T5QkV5UqNwO5lF9Z1k.vB5y9hUmP5L5jY8L8XY8wI8QqR8hJ5t5m5c5B5n"  # admin123
+  
+  ssh:
+    install-server: true
+    allow-pw: true
+  
+  storage:
+    layout:
+      name: lvm
+  
+  packages:
+    - openssh-server
+    - curl
+    - wget
+    - vim
+    - git
+    - htop
+  
+  user-data:
+    timezone: UTC
+    package_upgrade: true
+    
+  late-commands:
+    - echo 'admin ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/admin
+    - curl -o /target/tmp/post-install.sh http://{{ pxe_next_server }}/scripts/post-install.sh || true
+    - chmod +x /target/tmp/post-install.sh || true
+    - /target/tmp/post-install.sh || true
