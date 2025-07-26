@@ -1,0 +1,63 @@
+---
+- name: Install HTTP packages
+  package:
+    name: "{{ required_packages.http }}"
+    state: present
+
+- name: Create PXE HTTP root directory
+  file:
+    path: "{{ pxe_http_root }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Create HTTP subdirectories
+  file:
+    path: "{{ pxe_http_root }}/{{ item }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  loop:
+    - ubuntu
+    - cloud-init
+    - preseed
+    - scripts
+
+- name: Deploy Nginx PXE site configuration
+  template:
+    src: nginx-pxe.conf.j2
+    dest: "{{ service_configs.http }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: 
+    - restart nginx
+    - reload nginx
+
+- name: Enable PXE site
+  file:
+    src: "{{ service_configs.http }}"
+    dest: "/etc/nginx/sites-enabled/pxe"
+    state: link
+  notify: reload nginx
+
+- name: Disable default Nginx site
+  file:
+    path: "/etc/nginx/sites-enabled/default"
+    state: absent
+  notify: reload nginx
+
+- name: Ensure Nginx is running
+  service:
+    name: nginx
+    state: started
+    enabled: true
+
+- name: Download Ubuntu netboot files
+  include_tasks: download_ubuntu.yml
+  loop: "{{ ubuntu_versions }}"
+  loop_control:
+    loop_var: ubuntu_version
+  when: pxe_http_enabled | bool

@@ -4,8 +4,18 @@
     name: kea-dhcp4-server
     state: restarted
     enabled: true
-    
+
 - name: restart tftp
   service:
     name: tftpd-hpa
     state: restarted
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded

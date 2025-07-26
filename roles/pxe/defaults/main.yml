@@ -10,7 +10,9 @@ dhcp_subnets:
 
 # PXE Server Settings
 pxe_next_server: "{{ ansible_default_ipv4.address }}"
+tftp_enabled: true
 tftp_root: "/srv/tftp"
+pxe_http_enabled: true
 pxe_http_root: "/var/www/pxe"
 pxe_http_port: 80
 
@@ -20,10 +22,6 @@ default_boot_option: "ubuntu2204"
 ipxe_bootfile_bios: "netboot.xyz.kpxe"
 ipxe_bootfile_uefi_x86: "netboot.xyz.efi"
 ipxe_bootfile_uefi_arm: "netboot.xyz.efi"
-
-# TFTP Configuration
-tftp_root: "/srv/tftp"
-tftp_enabled: true
 
 # Netboot binaries
 netboot_binaries:
@@ -46,11 +44,15 @@ boot_files:
     arch: "x86_64"
     path: "memtest"
 
+# Mirror URLs
+ubuntu_mirror_url: "http://archive.ubuntu.com/ubuntu"
+ubuntu_ports_url: "http://ports.ubuntu.com/ubuntu-ports"
+
 
 # Ubuntu Versions
 ubuntu_versions:
-  - version: "22.04"
-    codename: "jammy"
+  - version: "24.04" 
+    codename: "noble"
     arch: ["amd64", "arm64"]
 
 # Preseed Configuration

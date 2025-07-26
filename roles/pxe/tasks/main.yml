@@ -8,3 +8,8 @@
   include_tasks: tftp.yml
   tags: [pxe, tftp]
   when: tftp_enabled | default(true) | bool
+
+- name: Include HTTP configuration
+  include_tasks: http.yml
+  tags: [pxe, http]
+  when: pxe_http_enabled | default(true) | bool
