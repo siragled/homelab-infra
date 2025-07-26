@@ -30,7 +30,6 @@ def test_nginx_listening(host):
 @pytest.mark.parametrize("subdir", [
     "ubuntu",
     "cloud-init", 
-    "preseed",
     "scripts"
 ])
 def test_http_subdirectories(host, subdir):

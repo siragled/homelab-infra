@@ -18,10 +18,38 @@ pxe_http_port: 80
 
 # iPXE Configuration
 ipxe_timeout: 5000
-default_boot_option: "ubuntu2204"
+default_boot_option: "ubuntu2404"
 ipxe_bootfile_bios: "netboot.xyz.kpxe"
 ipxe_bootfile_uefi_x86: "netboot.xyz.efi"
 ipxe_bootfile_uefi_arm: "netboot.xyz.efi"
+ipxe_enabled: true
+ipxe_menu_timeout: 30000 
+ipxe_default_option: "ubuntu-2404-amd64"
+
+# Custom iPXE menu options
+ipxe_menu_items:
+  - id: "ubuntu-2404-amd64"
+    name: "Ubuntu 24.04 LTS (AMD64)"
+    arch: "amd64"
+    kernel: "ubuntu/24.04/amd64/linux"
+    initrd: "ubuntu/24.04/amd64/initrd"
+    args: "autoinstall ds=nocloud-net;s=http://{{ pxe_next_server }}/cloud-init/"
+  
+  - id: "ubuntu-2404-arm64"
+    name: "Ubuntu 24.04 LTS (ARM64)"
+    arch: "arm64" 
+    kernel: "ubuntu/24.04/arm64/linux"
+    initrd: "ubuntu/24.04/arm64/initrd"  
+    args: "autoinstall ds=nocloud-net;s=http://{{ pxe_next_server }}/cloud-init-arm64/"
+    
+  # - id: "netboot-xyz"
+  #   name: "netboot.xyz (Internet Boot Menu)"
+  #   action: "chain"
+  #   url: "https://boot.netboot.xyz"
+
+# Organization branding
+organization_name: "Danil's homelab"
+contact_info: "https://github.com/siragled/homelab-infra"
 
 # Netboot binaries
 netboot_binaries:
@@ -47,7 +75,6 @@ boot_files:
 # Mirror URLs
 ubuntu_mirror_url: "http://archive.ubuntu.com/ubuntu"
 ubuntu_ports_url: "http://ports.ubuntu.com/ubuntu-ports"
-
 
 # Ubuntu Versions
 ubuntu_versions:

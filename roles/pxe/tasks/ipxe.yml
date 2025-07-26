@@ -1,0 +1,62 @@
+---
+- name: Create iPXE scripts directory
+  file:
+    path: "{{ pxe_http_root }}/ipxe"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Deploy main iPXE boot script
+  template:
+    src: boot.ipxe.j2
+    dest: "{{ pxe_http_root }}/boot.ipxe"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  when: ipxe_enabled | bool
+
+- name: Deploy architecture-specific iPXE scripts
+  template:
+    src: boot-arch.ipxe.j2
+    dest: "{{ pxe_http_root }}/ipxe/boot-{{ item }}.ipxe"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  loop:
+    - amd64
+    - arm64
+  when: ipxe_enabled | bool
+
+- name: Deploy autoinstall user-data files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ pxe_http_root }}/cloud-init/{{ item.dest }}"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  loop:
+    - src: user-data-amd64.j2
+      dest: user-data
+    - src: user-data-arm64.j2  
+      dest: user-data-arm64
+  when: ipxe_enabled | bool
+  register: user_data_result
+
+- name: Deploy meta-data files
+  template:
+    src: meta-data.j2
+    dest: "{{ pxe_http_root }}/cloud-init/{{ item }}"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  loop:
+    - meta-data
+    - meta-data-arm64
+  when: ipxe_enabled | bool
+  register: meta_data_result
+
+- name: List files in cloud-init directory
+  find:
+    paths: "{{ pxe_http_root }}/cloud-init"
+  register: cloud_init_files

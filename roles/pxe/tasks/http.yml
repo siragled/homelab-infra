@@ -22,7 +22,6 @@
   loop:
     - ubuntu
     - cloud-init
-    - preseed
     - scripts
 
 - name: Deploy Nginx PXE site configuration

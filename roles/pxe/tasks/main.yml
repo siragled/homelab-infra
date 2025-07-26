@@ -13,3 +13,8 @@
   include_tasks: http.yml
   tags: [pxe, http]
   when: pxe_http_enabled | default(true) | bool
+
+- name: Include iPXE configuration
+  include_tasks: ipxe.yml
+  tags: [pxe, ipxe]
+  when: ipxe_enabled | default(true) | bool
