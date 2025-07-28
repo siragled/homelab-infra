@@ -1,5 +1,0 @@
----
-# Recovery role tasks
-- name: Placeholder task for recovery role
-  debug:
-    msg: "Configuring recovery..."

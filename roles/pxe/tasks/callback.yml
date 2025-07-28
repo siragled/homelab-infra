@@ -40,7 +40,6 @@
   command: python3 -m venv /opt/pxe-callback/venv
   args:
     creates: /opt/pxe-callback/venv/bin/python
-  become: true
   become_user: pxe-callback
   when: callback_enabled | bool
 
@@ -49,7 +48,6 @@
     name: pip
     state: latest
     executable: /opt/pxe-callback/venv/bin/pip
-  become: true
   become_user: pxe-callback
   when: callback_enabled | bool
 
@@ -62,7 +60,6 @@
       - pyyaml==6.0.1
       - python-multipart==0.0.6
     executable: /opt/pxe-callback/venv/bin/pip
-  become: true
   become_user: pxe-callback
   when: callback_enabled | bool
 
@@ -112,7 +109,7 @@
     group: www-data
     mode: '0755'
   loop: "{{ post_install_scripts }}"
-  when:
+  when: 
     - callback_enabled | bool
     - post_install_enabled | bool
 
@@ -123,28 +120,22 @@
     owner: www-data
     group: www-data
     mode: '0755'
-  when:
+  when: 
     - callback_enabled | bool
     - post_install_enabled | bool
 
 - name: Check if callback service is configured in supervisor
-  community.general.supervisorctl:
-    name: pxe-callback
-    state: present
+  command: supervisorctl status pxe-callback
   register: callback_configured
   failed_when: false
   changed_when: false
   when: callback_enabled | bool
 
 - name: Add callback service to supervisor if not present
-  community.general.supervisorctl:
-    name: pxe-callback
-    state: present
-  when:
+  command: supervisorctl add pxe-callback
+  when: 
     - callback_enabled | bool
-    - callback_configured is defined
-    - not callback_configured.exists
-
+    - callback_configured.rc != 0
 
 - name: Ensure callback service is started
   supervisorctl:

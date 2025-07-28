@@ -1,3 +1,0 @@
----
-# Default variables for hypervisor role
-hypervisor_enabled: true

@@ -1,0 +1,22 @@
+---
+all:
+  children:
+    pxe_servers:
+      hosts:
+        pxe-server:
+          ansible_host: 192.168.100.10  
+          ansible_user: root
+          ansible_become: false
+          
+          # Network configuration for real hardware
+          pxe_next_server: 192.168.100.10  
+          dhcp_subnets:
+            - subnet: "192.168.1.0/24"
+              range_start: "192.168.1.100"
+              range_end: "192.168.1.255"
+              gateway: "192.168.1.1"      # Your router
+              dns_servers: ["8.8.8.8", "1.1.1.1"]
+              domain: "homelab.local"
+              
+          # ARM64/RPi specific settings
+          callback_api_host: "0.0.0.0"

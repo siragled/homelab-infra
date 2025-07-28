@@ -1,0 +1,21 @@
+---
+all:
+  children:
+    pxe_servers:
+      hosts:
+        pxe-server:  # This should match your container name
+          ansible_connection: docker
+          ansible_user: root
+          ansible_become: false  # Already root in container
+          
+          # PXE configuration
+          pxe_next_server: 192.168.100.10
+          dhcp_subnets:
+            - subnet: "192.168.100.0/24"
+              range_start: "192.168.100.100"
+              range_end: "192.168.100.200"
+              gateway: "192.168.100.1"
+              dns_servers: ["8.8.8.8", "1.1.1.1"]
+              domain: "docker.local"
+              
+          callback_api_host: "0.0.0.0"

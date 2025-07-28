@@ -1,10 +1,10 @@
 ---
-- name: PXE Boot Infrastructure
-  hosts: all
-  gather_facts: true
+- name: Deploy PXE Network Boot Infrastructure
+  hosts: pxe_servers
   become: true
-
-  tasks:
-    - name: Placeholder task for PXE Boot Infrastructure
-      debug:
-        msg: "Implementing PXE Boot Infrastructure automation..."
+  gather_facts: true
+    
+  roles:
+    - role: pxe
+      tags: [pxe, infra]
+  

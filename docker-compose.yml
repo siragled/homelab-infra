@@ -1,0 +1,173 @@
+services:
+  pxe-server:
+    image: geerlingguy/docker-ubuntu2404-ansible:latest
+    command: bash -c "apt-get update && /usr/sbin/init"
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /var/lib/containerd
+    container_name: pxe-server
+    hostname: pxe-server
+    cgroup: host
+    networks:
+      pxe-network:
+        ipv4_address: 192.168.100.10
+    ports:
+      - "67:67/udp"    
+      - "69:69/udp"  
+      - "80:80"         
+      - "5000:5000"
+
+# BIOS x86_64 client
+  pxe-client-bios:
+    image: ubuntu:24.04
+    container_name: pxe-client-bios
+    hostname: pxe-client-bios
+    depends_on:
+      - pxe-server
+    networks:
+      pxe-network:
+        ipv4_address: 192.168.100.101
+    command: |
+      bash -c "
+        apt-get update && apt-get install -y curl dhcpcd-base tftp-hpa jq
+        echo '🖥️ PXE Client BIOS starting...'
+        
+        # Simulate DHCP discovery
+        echo '📡 Testing DHCP server...'
+        dhcpcd -T eth0 || echo 'DHCP test completed'
+        
+        # Test TFTP server
+        echo '📁 Testing TFTP server...'
+        tftp 192.168.100.10 69 -c get netboot.xyz.kpxe || echo 'TFTP test completed'
+        
+        # Test HTTP endpoints
+        echo '🌍 Testing HTTP server...'
+        curl -s http://192.168.100.10/boot.ipxe > /dev/null && echo '✅ iPXE script accessible'
+        curl -s http://192.168.100.10/cloud-init/user-data > /dev/null && echo '✅ Cloud-init config accessible'
+        
+        # Simulate callback registration
+        echo '📞 Simulating node registration...'
+        sleep 30  # Simulate installation time
+        curl -X POST http://192.168.100.10:5000/register -H 'Content-Type: application/json' -d '{\"hostname\": \"pxe-client-bios\", \"mac_address\": \"02:42:ac:64:64:65\", \"ip_address\": \"192.168.100.101\", \"architecture\": \"amd64\", \"os_version\": \"Ubuntu 24.04 LTS\", \"installation_id\": \"docker-bios-'$(date +%s)'\", \"hardware_info\": {\"cpu_cores\": \"2\", \"memory_gb\": \"2\", \"disk_gb\": \"20\", \"firmware\": \"bios\"}}' && echo '✅ Node registered successfully'
+        
+        echo '🎉 PXE BIOS client simulation completed'
+        tail -f /dev/null
+      "
+
+  # UEFI x86_64 client  
+  pxe-client-uefi:
+    image: ubuntu:24.04
+    container_name: pxe-client-uefi
+    hostname: pxe-client-uefi
+    depends_on:
+      - pxe-server
+    networks:
+      pxe-network:
+        ipv4_address: 192.168.100.102
+    command: |
+      bash -c "
+        apt-get update && apt-get install -y curl dhcpcd-base tftp-hpa jq
+        echo '🖥️ PXE Client UEFI starting...'
+        
+        # Wait a bit to stagger startup
+        sleep 15
+        
+        # Test PXE workflow
+        echo '📡 Testing DHCP server...'
+        dhcpcd -T eth0 || echo 'DHCP test completed'
+        
+        echo '📁 Testing TFTP server...'
+        tftp 192.168.100.10 69 -c get netboot.xyz.efi || echo 'TFTP EFI test completed'
+        
+        echo '🌍 Testing HTTP endpoints...'
+        curl -s http://192.168.100.10/boot.ipxe > /dev/null && echo '✅ iPXE script accessible'
+        
+        # Simulate longer installation time for UEFI
+        echo '⏳ Simulating UEFI installation...'
+        sleep 45
+        
+        # Register as UEFI system
+        curl -X POST http://192.168.100.10:5000/register \
+          -H 'Content-Type: application/json' \
+          -d '{
+            \"hostname\": \"pxe-client-uefi\",
+            \"mac_address\": \"02:42:ac:64:64:66\",
+            \"ip_address\": \"192.168.100.102\",
+            \"architecture\": \"amd64\",
+            \"os_version\": \"Ubuntu 24.04 LTS\",
+            \"installation_id\": \"docker-uefi-$(date +%s)\",
+            \"hardware_info\": {
+              \"cpu_cores\": \"4\",
+              \"memory_gb\": \"4\",
+              \"disk_gb\": \"40\",
+              \"firmware\": \"uefi\"
+            }
+          }' && echo '✅ UEFI node registered successfully'
+        
+        echo '🎉 PXE UEFI client simulation completed'
+        tail -f /dev/null
+      "
+
+  # ARM64 client (Raspberry Pi simulation)
+  pxe-client-arm64:
+    image: ubuntu:24.04
+    container_name: pxe-client-arm64
+    hostname: pxe-client-arm64
+    depends_on:
+      - pxe-server
+    networks:
+      pxe-network:
+        ipv4_address: 192.168.100.103
+    command: |
+      bash -c "
+        apt-get update && apt-get install -y curl dhcpcd-base tftp-hpa jq
+        echo '🥧 PXE Client ARM64 (RPi) starting...'
+        
+        # Wait to stagger startup
+        sleep 25
+        
+        # Test ARM64-specific paths
+        echo '📡 Testing DHCP for ARM64...'
+        dhcpcd -T eth0 || echo 'DHCP test completed'
+        
+        echo '📁 Testing TFTP for ARM64...'
+        tftp 192.168.100.10 69 -c get netboot.xyz.kpxe || echo 'ARM64 TFTP test completed'
+        
+        echo '🌍 Testing ARM64 HTTP endpoints...'
+        curl -s http://192.168.100.10/ubuntu/24.04/arm64/linux > /dev/null && echo '✅ ARM64 kernel accessible'
+        
+        # Simulate RPi installation
+        echo '⏳ Simulating Raspberry Pi installation...'
+        sleep 60
+        
+        # Register as ARM64 system
+        curl -X POST http://192.168.100.10:5000/register \
+          -H 'Content-Type: application/json' \
+          -d '{
+            \"hostname\": \"pxe-client-rpi\",
+            \"mac_address\": \"dc:a6:32:12:34:56\",
+            \"ip_address\": \"192.168.100.103\",
+            \"architecture\": \"arm64\",
+            \"os_version\": \"Ubuntu 24.04 LTS\",
+            \"installation_id\": \"docker-arm64-$(date +%s)\",
+            \"hardware_info\": {
+              \"cpu_cores\": \"4\",
+              \"memory_gb\": \"8\",
+              \"disk_gb\": \"64\",
+              \"model\": \"Raspberry Pi 4B\",
+              \"firmware\": \"uefi\"
+            }
+          }' && echo '✅ ARM64 node registered successfully'
+        
+        echo '🎉 PXE ARM64 client simulation completed'
+        tail -f /dev/null
+      "
+
+networks:
+  pxe-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
+          gateway: 192.168.100.1
